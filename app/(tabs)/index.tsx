@@ -1,62 +1,35 @@
-import { View, Text, StyleSheet, Button, Pressable } from "react-native"
-import { Link } from "expo-router"
+import { View, Text, Image, StyleSheet, useWindowDimensions } from "react-native";
 
 export default function Home() {
+  const { width } = useWindowDimensions(); 
+  const isMobile = width < 600; 
 
-    return (
-        <View style={styles.container}>
-            <Link href="/about">
-                About
-            </Link>
-            <Link href="/contact">
-                Contact
-            </Link>
-            <View style={styles.child1}>
-                {/* <Text style={styles.text}>Layout</Text> */}
-                <View style={styles.child11}></View>
-                <View style={styles.child12}></View>
-            </View>
-            <View style={styles.child2}></View>
-            <View style={styles.child3}></View>
-        </View>
-    )
+  return (
+    <View style={[styles.container, { flexDirection: isMobile ? "column" : "row" }]}>
+      <Image 
+        source={{ uri: "https://lumiere-a.akamaihd.net/v1/images/open-uri20150422-20810-11ej849_779819a7.jpeg?region=0,0,600,600" }} 
+        style={[styles.image, { width: isMobile ? 180 : 250, height: isMobile ? 180 : 250 }]} 
+      />
+      <Text style={[styles.name, { fontSize: isMobile ? 30 : 50 }]}>Norman Asakil</Text>
+    </View>
+  );
 }
 
 const styles = StyleSheet.create({
-    child11: {
-        width: 20,
-        height: 20,
-        backgroundColor: 'orange',
-        borderRadius: 4
-    },
-    child12: {
-        width: 20,
-        height: 20,
-        backgroundColor: 'pink',
-        borderRadius: 4
-    },
-    container: {
-        flex: 1,
-        // flexDirection: 'row',
-        backgroundColor: 'orange',
-    },
-    child1: {
-        flex: 5,
-        flexDirection: 'row',
-        backgroundColor: 'green',
-        justifyContent: 'center',
-        gap: 50,
-        alignItems: 'center',
-    },
-    child2: {
-        flex: 6,
-        backgroundColor: 'red',
-    },
-    child3: {
-        flex: 1,
-        backgroundColor: 'blue',
-    },
-    text: {
-        color: '#fff',
-    }
-})
+  container: {
+    flex: 1,
+    alignItems: "center",
+    justifyContent: "center",
+    backgroundColor: "#A7B6DD",
+    padding: 20,
+    gap: 150,
+  },
+  image: {
+    borderRadius: 75, 
+  },
+  name: {
+    fontWeight: "bold",
+    color: "#333333",
+    textAlign: "center",
+  },
+});
