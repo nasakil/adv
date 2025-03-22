@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { View, Text, TextInput, Button, ScrollView, TouchableOpacity, StyleSheet, Alert } from "react-native";
 import { useRouter } from "expo-router";
-import he from "he"; 
+import he from "he";
 
 interface Question {
   question: string;
@@ -14,8 +14,8 @@ export default function QuizApp() {
   const [questions, setQuestions] = useState<Question[]>([]);
   const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
   const [score, setScore] = useState(0);
-  const [selectedAnswer, setSelectedAnswer] = useState<string | null>(null);
   const [isQuizStarted, setIsQuizStarted] = useState(false);
+  const [isQuizCompleted, setIsQuizCompleted] = useState(false);
   const router = useRouter();
 
   const fetchQuestions = async () => {
@@ -30,6 +30,7 @@ export default function QuizApp() {
       const data = await response.json();
       setQuestions(data.results);
       setIsQuizStarted(true);
+      setIsQuizCompleted(false);
       setCurrentQuestionIndex(0);
       setScore(0);
     } catch (error) {
@@ -44,16 +45,15 @@ export default function QuizApp() {
 
     if (currentQuestionIndex + 1 < questions.length) {
       setCurrentQuestionIndex(currentQuestionIndex + 1);
-      setSelectedAnswer(null);
     } else {
-      Alert.alert("Quiz Completed", `Your score: ${score + 1}/${questions.length}`);
+      setIsQuizCompleted(true);
       setIsQuizStarted(false);
     }
   };
 
   return (
     <ScrollView style={styles.container}>
-      {!isQuizStarted ? (
+      {!isQuizStarted && !isQuizCompleted ? (
         <View style={styles.startContainer}>
           <Text style={styles.title}>Enter Number of Questions (10-30):</Text>
           <TextInput
@@ -61,28 +61,33 @@ export default function QuizApp() {
             keyboardType="numeric"
             value={numQuestions}
             onChangeText={setNumQuestions}
+            placeholder="Enter a number"
+            placeholderTextColor="#888"
           />
-          <Button title="Start Quiz" onPress={fetchQuestions} />
+          <TouchableOpacity style={styles.startButton} onPress={fetchQuestions}>
+            <Text style={styles.buttonText}>Start Quiz</Text>
+          </TouchableOpacity>
+        </View>
+      ) : isQuizCompleted ? (
+        <View style={styles.resultContainer}>
+          <Text style={styles.resultText}>🎉 Quiz Completed!</Text>
+          <Text style={styles.resultScore}>Your score: {score}/{questions.length}</Text>
+          <TouchableOpacity style={styles.retryButton} onPress={() => setIsQuizCompleted(false)}>
+            <Text style={styles.buttonText}>Try Again</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <View style={styles.quizContainer}>
-          {/* Fix for question text */}
+          <Text style={styles.progressText}>Question {currentQuestionIndex + 1} / {questions.length}</Text>
           <Text style={styles.questionText}>{he.decode(questions[currentQuestionIndex].question)}</Text>
-
-          {/* Fix for answer choices */}
           {questions[currentQuestionIndex].incorrect_answers
             .concat(questions[currentQuestionIndex].correct_answer)
             .sort(() => Math.random() - 0.5)
             .map((answer, index) => (
-              <TouchableOpacity 
-                key={index} 
-                style={styles.answerButton} 
-                onPress={() => handleAnswer(answer)}
-              >
+              <TouchableOpacity key={index} style={styles.answerButton} onPress={() => handleAnswer(answer)}>
                 <Text style={styles.answerText}>{he.decode(answer)}</Text>
               </TouchableOpacity>
             ))}
-          
           <Text style={styles.scoreText}>Score: {score}</Text>
         </View>
       )}
@@ -93,49 +98,93 @@ export default function QuizApp() {
 const styles = StyleSheet.create({
   container: {
     padding: 20,
-    backgroundColor: "#F3F4F6",
+    backgroundColor: "#E8F0FE",
   },
   startContainer: {
     alignItems: "center",
     marginTop: 50,
   },
   title: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: "bold",
     marginBottom: 10,
+    color: "#333",
   },
   input: {
     borderWidth: 1,
-    borderColor: "#333",
+    borderColor: "#555",
     padding: 10,
     width: "80%",
     marginBottom: 20,
-    borderRadius: 5,
+    borderRadius: 10,
+    fontSize: 16,
+    textAlign: "center",
+  },
+  startButton: {
+    backgroundColor: "#007BFF",
+    padding: 15,
+    borderRadius: 10,
+    width: "60%",
+    alignItems: "center",
+  },
+  buttonText: {
+    color: "white",
+    fontSize: 18,
+    fontWeight: "bold",
   },
   quizContainer: {
     alignItems: "center",
   },
+  progressText: {
+    fontSize: 16,
+    marginBottom: 5,
+    color: "#666",
+  },
   questionText: {
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: "bold",
-    marginBottom: 10,
+    marginBottom: 15,
     textAlign: "center",
+    color: "#333",
   },
   answerButton: {
-    backgroundColor: "#4CAF50",
-    padding: 10,
-    borderRadius: 5,
+    backgroundColor: "#28A745",
+    padding: 15,
+    borderRadius: 10,
     marginVertical: 5,
     width: "80%",
     alignItems: "center",
   },
   answerText: {
     color: "white",
-    fontSize: 16,
+    fontSize: 18,
   },
   scoreText: {
     fontSize: 18,
     marginTop: 20,
     fontWeight: "bold",
+  },
+  resultContainer: {
+    alignItems: "center",
+    marginTop: 50,
+  },
+  resultText: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+    color: "#333",
+  },
+  resultScore: {
+    fontSize: 20,
+    fontWeight: "bold",
+    marginBottom: 20,
+    color: "#007BFF",
+  },
+  retryButton: {
+    backgroundColor: "#DC3545",
+    padding: 15,
+    borderRadius: 10,
+    width: "60%",
+    alignItems: "center",
   },
 });
