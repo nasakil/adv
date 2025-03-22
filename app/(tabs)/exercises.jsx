@@ -37,7 +37,7 @@ export default function Exercise() {
                 '• Email', 
                 '• Password'
             ], 
-            screen: '/register' 
+            screen: '/register'
         },
         { 
             title: 'Exercise 6', 
@@ -48,8 +48,14 @@ export default function Exercise() {
         },
         { 
             title: 'Exercise 7', 
-            description: [], 
-            screen: '/exercise7' 
+            description: [
+                'Create a simple quiz using the API from Open Trivia Database.',
+                'The user should be able to input the number of questions they want to answer,',
+                'with a minimum of 10 and a maximum of 30. The UI will also be considered in grading',
+                'this exercise. After completing the quiz,',
+                'the users score should be displayed as score/total questions.',
+            ], 
+            screen: '/quizapp/quiz' 
         },
     ];
 
@@ -73,7 +79,7 @@ export default function Exercise() {
                             )}
                             <TouchableOpacity 
                                 style={styles.button}
-                                onPress={() => router.push(exercise.screen)} // Navigate to the correct screen using the router
+                                onPress={() => router.push(exercise.screen)} 
                             >
                                 <Text style={styles.buttonText}>Go to </Text>
                             </TouchableOpacity>
@@ -128,4 +134,4 @@ const styles = StyleSheet.create({
         fontWeight: "bold",
         fontSize: 18,
     },
-}); 
+});     
